@@ -1,0 +1,31 @@
+{
+  "name": "personapilot",
+  "version": "1.0.0",
+  "description": "AI-Powered Personal Branding Platform with Complete Authentication",
+  "main": "index.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run dev"
+  },
+  "keywords": [
+    "authentication",
+    "oauth",
+    "google",
+    "linkedin",
+    "jwt",
+    "email-verification",
+    "password-reset",
+    "mern",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "PersonaPilot Team",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

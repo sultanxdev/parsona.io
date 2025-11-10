@@ -30,8 +30,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
+      <Router>
+        <AuthProvider>
           <div className="min-h-screen bg-background text-foreground">
             <Routes>
               {/* Public Routes */}
@@ -72,8 +72,8 @@ function App() {
               }}
             />
           </div>
-        </Router>
-      </AuthProvider>
+        </AuthProvider>
+      </Router>
     </ThemeProvider>
   )
 }
