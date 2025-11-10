@@ -3,22 +3,29 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const helmet = require('helmet')
 const rateLimit = require('express-rate-limit')
-require('dotenv').config()
+const path = require('path')
+
+// Load environment variables from root .env file
+require('dotenv').config({ path: path.join(__dirname, '../.env') })
+
+const config = require('./config/env')
 
 const app = express()
 
 // Security middleware
 app.use(helmet())
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: config.security.corsOrigin,
   credentials: true
 }))
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  windowMs: config.security.rateLimitWindowMs,
+  max: config.security.rateLimitMaxRequests,
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false
 })
 app.use('/api/', limiter)
 
@@ -27,14 +34,19 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/parsona', {
+mongoose.connect(config.mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(() => {
   console.log('✅ Connected to MongoDB')
+  console.log(`📊 Database: ${config.mongoUri.split('@')[1] || config.mongoUri}`)
   // Initialize scheduler service after database connection
-  require('./services/schedulerService')
+  try {
+    require('./services/schedulerService')
+  } catch (error) {
+    console.log('⚠️  Scheduler service not available')
+  }
 })
 .catch(err => console.error('❌ MongoDB connection error:', err))
 
@@ -72,9 +84,10 @@ app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' })
 })
 
-const PORT = process.env.PORT || 5000
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`)
-  console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`)
+app.listen(config.port, () => {
+  console.log(`🚀 Server running on port ${config.port}`)
+  console.log(`📱 Environment: ${config.nodeEnv}`)
+  console.log(`🌐 Frontend URL: ${config.frontendUrl}`)
+  console.log(`🔐 JWT Expiry: ${config.jwt.expiresIn}`)
+  console.log(`✅ Server ready!`)
 })

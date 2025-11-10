@@ -31,6 +31,24 @@ const userSchema = new mongoose.Schema({
     sparse: true,
     unique: true
   },
+  linkedinId: {
+    type: String,
+    sparse: true,
+    unique: true
+  },
+  // Email verification
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: String,
+  emailVerificationExpires: Date,
+  // Password reset
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  passwordChangedAt: Date,
+  // Account deletion
+  deletedAt: Date,
   // Connected social accounts (managed in dashboard)
   connectedAccounts: {
     twitter: {
@@ -158,8 +176,11 @@ const userSchema = new mongoose.Schema({
 
 // Indexes
 userSchema.index({ email: 1 })
-userSchema.index({ twitterId: 1 })
+userSchema.index({ googleId: 1 })
+userSchema.index({ linkedinId: 1 })
 userSchema.index({ 'subscription.plan': 1 })
+userSchema.index({ emailVerificationToken: 1 })
+userSchema.index({ passwordResetToken: 1 })
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {

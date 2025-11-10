@@ -566,6 +566,10 @@ router.get('/google/callback', async (req, res) => {
   try {
     const { code } = req.query
     
+    if (!code) {
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_code`)
+    }
+    
     // Exchange code for tokens
     const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
       client_id: process.env.GOOGLE_CLIENT_ID,
@@ -581,8 +585,10 @@ router.get('/google/callback', async (req, res) => {
     const userResponse = await axios.get(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${access_token}`)
     const { id, email, name, picture } = userResponse.data
 
-    // Check if user exists
-    let user = await User.findOne({ googleId: id })
+    // Check if user exists by googleId or email
+    let user = await User.findOne({ 
+      $or: [{ googleId: id }, { email }] 
+    })
     
     if (!user) {
       // Create new user
@@ -591,22 +597,142 @@ router.get('/google/callback', async (req, res) => {
         name,
         email,
         avatar: picture,
+        emailVerified: true, // Google emails are pre-verified
         onboardingCompleted: false
       })
       await user.save()
+
+      // Send welcome email
+      try {
+        const { sendWelcomeEmail } = require('../services/emailService')
+        await sendWelcomeEmail(email, name)
+      } catch (error) {
+        console.error('Failed to send welcome email:', error)
+      }
+    } else if (!user.googleId) {
+      // Link Google account to existing user
+      user.googleId = id
+      user.emailVerified = true
+      if (!user.avatar) user.avatar = picture
+      await user.save()
     }
 
-    // Generate JWT token
+    // Update last login
+    user.lastLoginAt = new Date()
+    await user.save()
+
+    // Generate JWT tokens
     const token = generateToken(user._id)
+    const refreshToken = generateRefreshToken(user._id)
     
-    // Redirect to frontend with token
+    // Redirect to frontend with tokens
     const redirectUrl = user.onboardingCompleted 
-      ? `${process.env.FRONTEND_URL}/dashboard?token=${token}`
-      : `${process.env.FRONTEND_URL}/onboarding?token=${token}`
+      ? `${process.env.FRONTEND_URL}/dashboard?token=${token}&refreshToken=${refreshToken}`
+      : `${process.env.FRONTEND_URL}/onboarding?token=${token}&refreshToken=${refreshToken}`
       
     res.redirect(redirectUrl)
   } catch (error) {
     console.error('Google OAuth error:', error)
+    res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_failed`)
+  }
+})
+
+// @route   GET /api/auth/linkedin
+// @desc    LinkedIn OAuth login
+// @access  Public
+router.get('/linkedin', (req, res) => {
+  const state = crypto.randomBytes(16).toString('hex')
+  const scope = 'openid profile email'
+  
+  const linkedinAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.LINKEDIN_AUTH_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_AUTH_CALLBACK_URL)}&state=${state}&scope=${encodeURIComponent(scope)}`
+  
+  res.redirect(linkedinAuthUrl)
+})
+
+// @route   GET /api/auth/linkedin/callback
+// @desc    LinkedIn OAuth callback
+// @access  Public
+router.get('/linkedin/callback', async (req, res) => {
+  try {
+    const { code, state } = req.query
+    
+    if (!code) {
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_code`)
+    }
+
+    // Exchange code for access token
+    const tokenResponse = await axios.post('https://www.linkedin.com/oauth/v2/accessToken', null, {
+      params: {
+        grant_type: 'authorization_code',
+        code,
+        client_id: process.env.LINKEDIN_AUTH_CLIENT_ID,
+        client_secret: process.env.LINKEDIN_AUTH_CLIENT_SECRET,
+        redirect_uri: process.env.LINKEDIN_AUTH_CALLBACK_URL
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+
+    const { access_token } = tokenResponse.data
+
+    // Get user profile
+    const profileResponse = await axios.get('https://api.linkedin.com/v2/userinfo', {
+      headers: {
+        'Authorization': `Bearer ${access_token}`
+      }
+    })
+
+    const { sub: linkedinId, email, name, picture } = profileResponse.data
+
+    // Check if user exists by linkedinId or email
+    let user = await User.findOne({ 
+      $or: [{ linkedinId }, { email }] 
+    })
+    
+    if (!user) {
+      // Create new user
+      user = new User({
+        linkedinId,
+        name,
+        email,
+        avatar: picture,
+        emailVerified: true, // LinkedIn emails are pre-verified
+        onboardingCompleted: false
+      })
+      await user.save()
+
+      // Send welcome email
+      try {
+        const { sendWelcomeEmail } = require('../services/emailService')
+        await sendWelcomeEmail(email, name)
+      } catch (error) {
+        console.error('Failed to send welcome email:', error)
+      }
+    } else if (!user.linkedinId) {
+      // Link LinkedIn account to existing user
+      user.linkedinId = linkedinId
+      user.emailVerified = true
+      if (!user.avatar) user.avatar = picture
+      await user.save()
+    }
+
+    // Update last login
+    user.lastLoginAt = new Date()
+    await user.save()
+
+    // Generate JWT tokens
+    const token = generateToken(user._id)
+    const refreshToken = generateRefreshToken(user._id)
+    
+    // Redirect to frontend with tokens
+    const redirectUrl = user.onboardingCompleted 
+      ? `${process.env.FRONTEND_URL}/dashboard?token=${token}&refreshToken=${refreshToken}`
+      : `${process.env.FRONTEND_URL}/onboarding?token=${token}&refreshToken=${refreshToken}`
+      
+    res.redirect(redirectUrl)
+  } catch (error) {
+    console.error('LinkedIn OAuth error:', error.response?.data || error)
     res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_failed`)
   }
 })
