@@ -1,278 +1,118 @@
-# PersonaPilot - Complete Authentication System
+# 🧠 Parsona (Under Development)
 
-AI-Powered Personal Branding Platform with complete authentication system including Google & LinkedIn OAuth, email verification, password reset, and more.
+🚧 **Work in Progress** — Parsona is an AI-powered personal brand intelligence platform that helps creators, founders, and professionals understand, monitor, and grow their online presence across social platforms.
 
-## 🚀 Features
+Parsona centralizes analytics, sentiment, and content insights into one unified dashboard.
 
-### Authentication
-- ✅ **Email/Password Authentication** - Traditional signup/login
-- ✅ **Google OAuth** - Sign in with Google
-- ✅ **LinkedIn OAuth** - Sign in with LinkedIn
-- ✅ **Email Verification** - Verify user emails
-- ✅ **Password Reset** - Forgot password functionality
-- ✅ **JWT Tokens** - Access & refresh token system
-- ✅ **Session Management** - Secure session handling
-- ✅ **Account Management** - Update profile, change password, delete account
+---
 
-### Security
-- 🔒 Rate limiting on API endpoints
-- 🔒 Password hashing with bcrypt
-- 🔒 JWT token expiration & refresh
-- 🔒 CORS protection
-- 🔒 Helmet security headers
-- 🔒 Input validation & sanitization
+## Product Overview
 
-## 📁 Project Structure
+**Name:** Parsona  
+**Tagline:** Understand your online presence. Build a stronger personal brand.  
+**Mission:** Help individuals and brands make informed content and positioning decisions by analyzing audience sentiment, engagement patterns, and brand perception.
 
-```
-personapilot/
-├── .env                          # Global environment configuration
-├── .env.example                  # Environment template
-├── .gitignore                    # Git ignore rules
-├── README.md                     # This file
-│
-├── backend/
-│   ├── config/
-│   │   └── env.js               # Environment config loader
-│   ├── middleware/
-│   │   └── auth.js              # JWT authentication middleware
-│   ├── models/
-│   │   ├── User.js              # User model with OAuth support
-│   │   ├── Role.js              # Role/Persona model
-│   │   ├── Post.js              # Post model
-│   │   └── Trend.js             # Trend model
-│   ├── routes/
-│   │   ├── auth.js              # Complete auth routes
-│   │   ├── users.js             # User management routes
-│   │   ├── posts.js             # Post routes
-│   │   ├── trends.js            # Trend routes
-│   │   ├── analytics.js         # Analytics routes
-│   │   ├── billing.js           # Billing routes
-│   │   ├── connections.js       # Social media connections
-│   │   └── admin.js             # Admin routes
-│   ├── services/
-│   │   ├── emailService.js      # Email sending service
-│   │   └── schedulerService.js  # Cron jobs
-│   ├── server.js                # Express server
-│   └── package.json             # Backend dependencies
-│
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── auth/
-    │   │   │   └── ProtectedRoute.jsx
-    │   │   ├── layout/
-    │   │   └── ui/
-    │   ├── config/
-    │   │   └── env.js           # Frontend config
-    │   ├── contexts/
-    │   │   ├── AuthContext.jsx  # Auth state management
-    │   │   └── ThemeContext.jsx
-    │   ├── lib/
-    │   │   └── axios.js         # Axios instance with interceptors
-    │   ├── pages/
-    │   │   ├── auth/
-    │   │   │   ├── LoginPage.jsx
-    │   │   │   ├── SignupPage.jsx
-    │   │   │   ├── ForgotPasswordPage.jsx
-    │   │   │   ├── ResetPasswordPage.jsx
-    │   │   │   └── OnboardingPage.jsx
-    │   │   └── dashboard/
-    │   ├── App.jsx
-    │   └── main.jsx
-    └── package.json             # Frontend dependencies
+---
 
-```
+## Current Status
 
-## 🛠️ Setup Instructions
+- Product concept and scope defined  
+- Core feature set finalized  
+- Data ingestion and analysis pipelines in progress  
+- Dashboard and AI insights under development  
+- Not production-ready  
 
-### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (local or Atlas)
-- Gmail account (for email service)
-- Google Cloud Console account (for OAuth)
-- LinkedIn Developer account (for OAuth)
+---
 
-### 1. Clone & Install
+## Problem
 
-```bash
-# Install backend dependencies
-cd backend
-npm install
+Creators and professionals often struggle with:
+- Fragmented analytics across multiple platforms  
+- Lack of insight into audience sentiment and brand perception  
+- Difficulty understanding why certain content performs better  
+- Manual content planning without data-backed direction  
 
-# Install frontend dependencies
-cd ../frontend
-npm install
-```
+---
 
-### 2. Environment Configuration
+## Solution
 
-Copy `.env.example` to `.env` in the root directory:
+Parsona provides a centralized platform to:
+- Aggregate social media analytics in one place  
+- Analyze sentiment and semantic trends around content and comments  
+- Surface actionable insights for content and brand growth  
+- Support consistent, data-driven personal branding  
 
-```bash
-cp .env.example .env
-```
+---
 
-### 3. Configure OAuth Providers
+## Key Features (Planned)
 
-#### Google OAuth Setup
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing
-3. Enable Google+ API
-4. Go to Credentials → Create OAuth 2.0 Client ID
-5. Add authorized redirect URI: `http://localhost:5000/api/auth/google/callback`
-6. Copy Client ID and Secret to `.env`
+- Multi-platform analytics dashboard  
+- Audience sentiment and semantic analysis  
+- Comment and engagement quality insights  
+- Brand perception tracking over time  
+- Content performance breakdowns  
+- AI-generated content ideas and suggestions  
+- Alerts for negative sentiment or unusual engagement  
 
-#### LinkedIn OAuth Setup
-1. Go to [LinkedIn Developers](https://www.linkedin.com/developers/apps)
-2. Create a new app
-3. Add redirect URL: `http://localhost:5000/api/auth/linkedin/callback`
-4. Request access to Sign In with LinkedIn
-5. Copy Client ID and Secret to `.env`
+---
 
-#### Gmail SMTP Setup
-1. Enable 2-Factor Authentication on your Gmail
-2. Go to [App Passwords](https://myaccount.google.com/apppasswords)
-3. Generate an app password
-4. Add to `.env` as `SMTP_PASS`
 
-### 4. Generate Secure Secrets
+Design goals:
+- Scalable data ingestion  
+- Near real-time analytics  
+- Platform-agnostic architecture  
+- Explainable AI insights  
 
-```bash
-# Generate JWT secrets
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
+---
 
-Add the generated secrets to `.env`:
-- `JWT_SECRET`
-- `JWT_REFRESH_SECRET`
-- `SESSION_SECRET`
+## Tech Stack
 
-### 5. Start MongoDB
+- **Frontend:** Next.js + TypeScript + Tailwind CSS  
+- **Backend:** Node.js + Express  
+- **Database:** PostgreSQL  
+- **AI / NLP:** LLM-based sentiment and semantic analysis  
+- **Auth:** JWT  
+- **Infra:** Docker + Cloud (AWS / GCP / Vercel)  
 
-```bash
-# Local MongoDB
-mongod
+---
 
-# Or use MongoDB Atlas connection string in .env
-```
+## Roadmap
 
-### 6. Run the Application
+- Support for additional social platforms  
+- Advanced sentiment trend visualization  
+- Brand comparison and benchmarking  
+- Scheduling and publishing assistance  
+- Team and agency collaboration features  
 
-```bash
-# Terminal 1 - Backend
-cd backend
-npm run dev
+---
 
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
-```
+## Contributing
 
-Backend: http://localhost:5000
-Frontend: http://localhost:5173
+This is currently a solo developer project.  
+Feedback, ideas, and feature requests are welcome.
 
-## 🔐 Authentication Endpoints
+---
 
-### Public Routes
-- `POST /api/auth/signup` - Register with email/password
-- `POST /api/auth/login` - Login with email/password
-- `GET /api/auth/google` - Google OAuth login
-- `GET /api/auth/google/callback` - Google OAuth callback
-- `GET /api/auth/linkedin` - LinkedIn OAuth login
-- `GET /api/auth/linkedin/callback` - LinkedIn OAuth callback
-- `POST /api/auth/forgot-password` - Request password reset
-- `POST /api/auth/reset-password/:token` - Reset password
-- `GET /api/auth/verify-email/:token` - Verify email
+## Contact
 
-### Protected Routes
-- `GET /api/auth/me` - Get current user
-- `POST /api/auth/refresh` - Refresh access token
-- `POST /api/auth/logout` - Logout user
-- `POST /api/auth/change-password` - Change password
-- `PUT /api/auth/update-profile` - Update profile
-- `POST /api/auth/resend-verification` - Resend verification email
-- `DELETE /api/auth/delete-account` - Delete account
+Built by **Sultan Alam**  
+LinkedIn: https://www.linkedin.com/in/sultan-alam436/  
+Email: sultancodess@gmail.com  
 
-## 📧 Email Templates
+---
 
-The system includes beautiful HTML email templates for:
-- Welcome emails
-- Email verification
-- Password reset
-- Account notifications
+## License
 
-## 🔄 Token Management
+MIT License (to be applied after MVP stabilization).  
+All rights reserved during active development.
 
-- **Access Token**: Short-lived (15 minutes) for API requests
-- **Refresh Token**: Long-lived (30 days) for getting new access tokens
-- Automatic token refresh on 401 errors
-- Secure token storage in localStorage
+---
 
-## 🛡️ Security Features
+## Note
 
-- Password hashing with bcrypt (12 rounds)
-- JWT token expiration
-- Rate limiting (100 requests per 15 minutes)
-- CORS protection
-- Helmet security headers
-- Input validation with express-validator
-- SQL injection prevention
-- XSS protection
+This repository is under active development and not yet production-ready.  
+Expect breaking changes as Parsona evolves.
 
-## 📱 Frontend Features
 
-- Responsive design
-- Dark/Light theme support
-- Toast notifications
-- Loading states
-- Error handling
-- Protected routes
-- OAuth integration
-- Form validation
 
-## 🚀 Deployment
 
-### Backend (Heroku/Railway/Render)
-1. Set all environment variables
-2. Update `FRONTEND_URL` to production URL
-3. Update OAuth callback URLs
-4. Deploy
-
-### Frontend (Vercel/Netlify)
-1. Set `VITE_API_URL` to backend URL
-2. Update OAuth redirect URLs
-3. Deploy
-
-## 📝 Environment Variables Reference
-
-See `.env.example` for complete list with descriptions.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Open pull request
-
-## 📄 License
-
-MIT License - see LICENSE file for details
-
-## 🆘 Support
-
-For issues and questions:
-- Create an issue on GitHub
-- Email: support@personapilot.io
-
-## 🎉 Credits
-
-Built with:
-- Express.js
-- React + Vite
-- MongoDB
-- JWT
-- Nodemailer
-- Axios
-- TailwindCSS
